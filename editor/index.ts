@@ -12,3 +12,8 @@ export interface Editor {
     getPatchCard(i: number): { id: number; enabled: boolean };
     setPatchCard(i: number, id: number, enabled: boolean);
 }
+
+export interface EditorConstructor {
+    new (buf: ArrayBuffer): Editor;
+    NAME: string;
+}

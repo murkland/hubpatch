@@ -112,12 +112,12 @@ const PATCH_CARD_INFOS = [
     { name: "CosmoMan", nameJa: "コスモマン", mb: 44 },
     { name: "Chaud's Custom", nameJa: "炎山のカスタマイズ", mb: 35 },
     {
-        name: "Mr.-Match's Custom",
+        name: "Mr. Match's Custom",
         nameJa: "ヒノケンのカスタマイズ",
         mb: 35,
     },
     {
-        name: "Count-Zap's Custom",
+        name: "Count Zap's Custom",
         nameJa: "エレキ伯爵のカスタマイズ",
         mb: 35,
     },
@@ -205,6 +205,8 @@ const PATCH_CARD_INFOS = [
 export class Editor implements EditorBase {
     dv: DataView;
     gameInfo: GameInfo;
+
+    static NAME = "bn5";
 
     constructor(buffer: ArrayBuffer) {
         buffer = buffer.slice(SRAM_START_OFFSET, SRAM_START_OFFSET + SRAM_SIZE);

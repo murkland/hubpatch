@@ -1,7 +1,8 @@
 import { Editor as BN5Editor } from './editor/bn5';
-import { Editor } from './editor/index';
+import { Editor as BN6Editor } from './editor/bn6';
+import { Editor, EditorConstructor } from './editor/index';
 
-const EDITOR_FACTORIES = [BN5Editor];
+const EDITOR_CONSTRUCTORS: EditorConstructor[] = [BN5Editor, BN6Editor];
 
 const saveFileInput = document.getElementById("save")! as HTMLInputElement;
 const patchCardsTable = document.getElementById("patch-cards")!;
@@ -17,10 +18,10 @@ const addPatchCardSelectCaption = addPatchCardSelect
     .querySelector("option:first-child")
     .cloneNode(true);
 
-function downloadBlob(blob: Blob) {
+function downloadBlob(blob: Blob, name: string) {
     const objectURL = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.download = "bn5.sav";
+    a.download = name;
     a.href = objectURL;
     a.textContent = "download";
     document.body.appendChild(a);
@@ -31,7 +32,6 @@ function downloadBlob(blob: Blob) {
 
 function populatePatchCards() {
     addPatchCardSelect.innerHTML = "";
-    console.log(addPatchCardSelectCaption);
     addPatchCardSelect.appendChild(addPatchCardSelectCaption);
 
     const patchCardInfos = editor.getPatchCardInfos();
@@ -126,7 +126,7 @@ downloadButton.addEventListener("click", () => {
         return;
     }
     const blob = new Blob([new Uint8Array(editor.export())]);
-    downloadBlob(blob);
+    downloadBlob(blob, `${(editor.constructor as EditorConstructor).NAME}.sav`);
 });
 
 saveFileInput.addEventListener("change", () => {
@@ -138,14 +138,24 @@ saveFileInput.addEventListener("change", () => {
 
     (async () => {
         const buf = await file.arrayBuffer();
+        const errors = [];
 
-        for (const Editor of EDITOR_FACTORIES) {
+        for (const Editor of EDITOR_CONSTRUCTORS) {
             try {
                 editor = new Editor(buf);
             } catch (e) {
-                alert(`Failed to load save: ${e}`);
-                return;
+                errors.push([Editor, e]);
             }
+        }
+
+        if (editor == null) {
+            alert(
+                `Could not load save file・セーブファイルをロードできなかった\n\n${errors
+                    .map(([Editor, e]) => ` • ${Editor.NAME}: ${e}`)
+                    .join("\n")}`
+            );
+            saveFileInput.value = null;
+            return;
         }
 
         populatePatchCards();
@@ -154,3 +164,5 @@ saveFileInput.addEventListener("change", () => {
         addPatchCardSelect.disabled = false;
     })();
 });
+
+saveFileInput.value = null;
