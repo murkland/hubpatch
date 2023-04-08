@@ -24,10 +24,10 @@ function downloadBlob(blob: Blob) {
 
 function populatePatchCards() {
     for (let i = 1; i < Editor.PATCH_CARD_INFO.length; ++i) {
-        const { name, mb } = Editor.PATCH_CARD_INFO[i];
+        const { name, nameJa, mb } = Editor.PATCH_CARD_INFO[i];
         const option = document.createElement("option");
         addPatchCardSelect.appendChild(option);
-        option.textContent = `${name} (${mb} MB)`;
+        option.textContent = `${name}・${nameJa} (${mb} MB)`;
         option.value = i.toString();
     }
 }
@@ -87,7 +87,7 @@ function update() {
 
         const nameTd = document.createElement("td");
         tr.appendChild(nameTd);
-        nameTd.textContent = patchCard.name;
+        nameTd.textContent = `${patchCard.name}・${patchCard.nameJa}`;
 
         const mbTd = document.createElement("td");
         tr.appendChild(mbTd);
