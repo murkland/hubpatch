@@ -1,14 +1,21 @@
-import { Editor } from './editor';
+import { Editor as BN5Editor } from './editor/bn5';
+import { Editor } from './editor/index';
+
+const EDITOR_FACTORIES = [BN5Editor];
 
 const saveFileInput = document.getElementById("save")! as HTMLInputElement;
 const patchCardsTable = document.getElementById("patch-cards")!;
 const totalMB = document.getElementById("total-mb")!;
+const maxMB = document.getElementById("max-mb")!;
 const downloadButton = document.getElementById(
     "download"
 )! as HTMLButtonElement;
 const addPatchCardSelect = document.getElementById(
     "add-patch-card"
 )! as HTMLSelectElement;
+const addPatchCardSelectCaption = addPatchCardSelect
+    .querySelector("option:first-child")
+    .cloneNode(true);
 
 function downloadBlob(blob: Blob) {
     const objectURL = URL.createObjectURL(blob);
@@ -23,8 +30,13 @@ function downloadBlob(blob: Blob) {
 }
 
 function populatePatchCards() {
-    for (let i = 1; i < Editor.PATCH_CARD_INFO.length; ++i) {
-        const { name, nameJa, mb } = Editor.PATCH_CARD_INFO[i];
+    addPatchCardSelect.innerHTML = "";
+    console.log(addPatchCardSelectCaption);
+    addPatchCardSelect.appendChild(addPatchCardSelectCaption);
+
+    const patchCardInfos = editor.getPatchCardInfos();
+    for (let i = 1; i < patchCardInfos.length; ++i) {
+        const { name, nameJa, mb } = patchCardInfos[i];
         const option = document.createElement("option");
         addPatchCardSelect.appendChild(option);
         option.textContent = `${name}・${nameJa} (${mb} MB)`;
@@ -55,13 +67,16 @@ function deletePatchCard(editor: Editor, i: number) {
 const MAX_MB = 80;
 
 function update() {
+    const patchCardInfos = editor.getPatchCardInfos();
+    maxMB.textContent = MAX_MB.toString();
+
     const tbody = patchCardsTable.querySelector("tbody");
     tbody.innerHTML = "";
 
     let total = 0;
     for (let i = 0, n = editor.getPatchCardCount(); i < n; ++i) {
         const { id, enabled } = editor.getPatchCard(i);
-        const patchCard = Editor.PATCH_CARD_INFO[id];
+        const patchCard = patchCardInfos[id];
         if (enabled) {
             total += patchCard.mb;
         }
@@ -99,7 +114,7 @@ function update() {
         if (option.value == "") {
             continue;
         }
-        const { mb } = Editor.PATCH_CARD_INFO[parseInt(option.value, 10)];
+        const { mb } = patchCardInfos[parseInt(option.value, 10)];
         option.disabled = total + mb > MAX_MB;
     }
 }
@@ -110,8 +125,7 @@ downloadButton.addEventListener("click", () => {
     if (editor == null) {
         return;
     }
-    editor.rebuild();
-    const blob = new Blob([new Uint8Array(editor.toSRAMDump())]);
+    const blob = new Blob([new Uint8Array(editor.export())]);
     downloadBlob(blob);
 });
 
@@ -125,19 +139,18 @@ saveFileInput.addEventListener("change", () => {
     (async () => {
         const buf = await file.arrayBuffer();
 
-        try {
-            const raw = Editor.sramDumpToRaw(buf);
-            const gameInfo = Editor.sniff(raw);
-            editor = new Editor(raw, gameInfo);
-        } catch (e) {
-            alert(`Failed to load save: ${e}`);
-            return;
+        for (const Editor of EDITOR_FACTORIES) {
+            try {
+                editor = new Editor(buf);
+            } catch (e) {
+                alert(`Failed to load save: ${e}`);
+                return;
+            }
         }
 
+        populatePatchCards();
         update();
         downloadButton.disabled = false;
         addPatchCardSelect.disabled = false;
     })();
 });
-
-populatePatchCards();
