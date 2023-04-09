@@ -34,25 +34,46 @@
                     editor・エグゼ５、６セーブファイル改造カードエディタ
                 </p>
             </div>
-            <div class="mb-3">
+            <div class="input-group mb-3">
                 <input type="file" id="save" class="form-control" />
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="download"
+                    disabled
+                >
+                    Download・ダウンロード
+                </button>
             </div>
-            <select class="form-select" id="add-patch-card" disabled>
-                <option value="" disabled selected>
-                    Add a Patch Card・改造カードを追加
-                </option>
-            </select>
             <table id="patch-cards" class="table mb-3">
-                <thead class="table-light">
-                    <tr>
+                <thead>
+                    <tr class="table-light">
                         <th style="width: 0px"></th>
                         <th>Name・名</th>
                         <th>MB</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
-                <tfoot class="table-light">
+                <tfoot>
                     <tr>
+                        <td>
+                            <button class="btn btn-danger btn-small invisible">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </td>
+                        <td colspan="2">
+                            <select
+                                class="form-select"
+                                id="add-patch-card"
+                                disabled
+                            >
+                                <option value="" disabled selected>
+                                    Add a Patch Card・改造カードを追加
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="table-light">
                         <td></td>
                         <th>Total・合計</th>
                         <td>
@@ -63,16 +84,6 @@
                     </tr>
                 </tfoot>
             </table>
-            <div>
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    id="download"
-                    disabled
-                >
-                    Download・ダウンロード
-                </button>
-            </div>
         </div>
         <script src="index.ts" type="module"></script>
     </body>
