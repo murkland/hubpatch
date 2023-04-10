@@ -1,6 +1,6 @@
-import { Editor as BN5Editor } from './editor/bn5';
-import { Editor as BN6Editor } from './editor/bn6';
-import { Editor, EditorConstructor } from './editor/index';
+import { Editor as BN5Editor } from "./editor/bn5";
+import { Editor as BN6Editor } from "./editor/bn6";
+import { Editor, EditorConstructor } from "./editor/index";
 
 const EDITOR_CONSTRUCTORS: EditorConstructor[] = [BN5Editor, BN6Editor];
 
@@ -15,7 +15,7 @@ const addPatchCardSelect = document.getElementById(
     "add-patch-card"
 )! as HTMLSelectElement;
 const addPatchCardSelectCaption = addPatchCardSelect
-    .querySelector("option:first-child")
+    .querySelector("option:first-child")!
     .cloneNode(true);
 
 function downloadBlob(blob: Blob, name: string) {
@@ -58,7 +58,7 @@ addPatchCardSelect.addEventListener("change", () => {
 function deletePatchCard(editor: Editor, i: number) {
     const n = editor.getPatchCardCount();
     for (; i < n - 1; ++i) {
-        const { id, enabled } = editor.getPatchCard(i + 1);
+        const { id, enabled } = editor.getPatchCard(i + 1)!;
         editor.setPatchCard(i, id, enabled);
     }
     editor.setPatchCardCount(editor.getPatchCardCount() - 1);
@@ -70,12 +70,12 @@ function update() {
     const patchCardInfos = editor.getPatchCardInfos();
     maxMB.textContent = MAX_MB.toString();
 
-    const tbody = patchCardsTable.querySelector("tbody");
+    const tbody = patchCardsTable.querySelector("tbody")!;
     tbody.innerHTML = "";
 
     let total = 0;
     for (let i = 0, n = editor.getPatchCardCount(); i < n; ++i) {
-        const { id, enabled } = editor.getPatchCard(i);
+        const { id, enabled } = editor.getPatchCard(i)!;
         const patchCard = patchCardInfos[id];
         if (enabled) {
             total += patchCard.mb;
@@ -109,13 +109,14 @@ function update() {
         mbTd.textContent = patchCard.mb.toString();
     }
     totalMB.textContent = total.toString();
+    totalMB.className = total > MAX_MB ? "text-danger" : "";
 
     for (const option of addPatchCardSelect.querySelectorAll("option")) {
         if (option.value == "") {
             continue;
         }
         const { mb } = patchCardInfos[parseInt(option.value, 10)];
-        option.disabled = total + mb > MAX_MB;
+        option.className = total + mb > MAX_MB ? "text-danger" : "";
     }
 }
 
@@ -130,7 +131,7 @@ downloadButton.addEventListener("click", () => {
 });
 
 saveFileInput.addEventListener("change", () => {
-    if (saveFileInput.files.length == 0) {
+    if (saveFileInput.files == null || saveFileInput.files.length == 0) {
         return;
     }
 
@@ -138,7 +139,7 @@ saveFileInput.addEventListener("change", () => {
 
     (async () => {
         const buf = await file.arrayBuffer();
-        const errors = [];
+        const errors: [EditorConstructor, any][] = [];
 
         for (const Editor of EDITOR_CONSTRUCTORS) {
             try {
@@ -154,7 +155,7 @@ saveFileInput.addEventListener("change", () => {
                     .map(([Editor, e]) => ` • ${Editor.NAME}: ${e}`)
                     .join("\n")}`
             );
-            saveFileInput.value = null;
+            saveFileInput.value = "";
             return;
         }
 
@@ -165,4 +166,4 @@ saveFileInput.addEventListener("change", () => {
     })();
 });
 
-saveFileInput.value = null;
+saveFileInput.value = "";

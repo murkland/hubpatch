@@ -9,7 +9,7 @@ export interface Editor {
     getPatchCardInfos(): PatchCardInfo[];
     getPatchCardCount(): number;
     setPatchCardCount(n: number);
-    getPatchCard(i: number): { id: number; enabled: boolean };
+    getPatchCard(i: number): { id: number; enabled: boolean } | null;
     setPatchCard(i: number, id: number, enabled: boolean);
 }
 
