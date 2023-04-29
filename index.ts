@@ -6,6 +6,7 @@ const EDITOR_CONSTRUCTORS: EditorConstructor[] = [BN5Editor, BN6Editor];
 
 const saveFileInput = document.getElementById("save")! as HTMLInputElement;
 const patchCardsTable = document.getElementById("patch-cards")!;
+const totalRow = document.getElementById("total-row")!;
 const totalMB = document.getElementById("total-mb")!;
 const maxMB = document.getElementById("max-mb")!;
 const downloadButton = document.getElementById(
@@ -107,9 +108,17 @@ function update() {
         const mbTd = document.createElement("td");
         tr.appendChild(mbTd);
         mbTd.textContent = patchCard.mb.toString();
+
+        if (total > MAX_MB) {
+            tr.className = "text-danger";
+        }
+    }
+    if (total > MAX_MB) {
+        totalRow.classList.add("text-danger");
+    } else {
+        totalRow.classList.remove("text-danger");
     }
     totalMB.textContent = total.toString();
-    totalMB.className = total > MAX_MB ? "text-danger" : "";
 
     for (const option of addPatchCardSelect.querySelectorAll("option")) {
         if (option.value == "") {
