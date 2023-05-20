@@ -245,6 +245,7 @@ export class Editor implements EditorBase {
     }
 
     rebuild() {
+        this.rebuildPatchCardsLoaded();
         this.rebuildChecksum();
     }
 
@@ -258,6 +259,12 @@ export class Editor implements EditorBase {
 
     getChecksum() {
         return getChecksum(this.dv);
+    }
+
+    rebuildPatchCardsLoaded() {
+        for (let i = 0; i < this.getPatchCardCount(); ++i) {
+            this.setPatchCardLoaded(this.getPatchCard(i)!.id, true);
+        }
     }
 
     rebuildChecksum() {
@@ -290,5 +297,18 @@ export class Editor implements EditorBase {
 
     setPatchCard(i: number, id: number, enabled: boolean) {
         this.dv.setUint8(0x79d0 + i, id | ((enabled ? 0 : 1) << 7));
+    }
+
+    setPatchCardLoaded(id: number, loaded: boolean) {
+        this.dv.setUint8(
+            0x60dc + id,
+            this.dv.getUint8(0x1220 + id) ^
+                (loaded
+                    ? {
+                          colonel: 0x8d,
+                          protoman: 0x43,
+                      }[this.gameInfo.version]
+                    : 0xff)
+        );
     }
 }

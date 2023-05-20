@@ -223,9 +223,6 @@ export class Editor implements EditorBase {
     }
 
     rebuildPatchCardsLoaded() {
-        for (let i = 1; i < 118; ++i) {
-            this.setPatchCardLoaded(i, false);
-        }
         for (let i = 0; i < this.getPatchCardCount(); ++i) {
             this.setPatchCardLoaded(this.getPatchCard(i)!.id, true);
         }
@@ -265,8 +262,8 @@ export class Editor implements EditorBase {
 
     setPatchCardLoaded(id: number, loaded: boolean) {
         this.dv.setUint8(
-            0x5047 + id,
-            this.dv.getUint8(0x06bf + id) ^
+            0x5048 + id,
+            this.dv.getUint8(0x06c0 + id) ^
                 (loaded
                     ? {
                           falzar: 0x8d,
